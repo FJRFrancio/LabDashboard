@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Public Instrument Board</title>
+  <link rel="stylesheet" href="/static/style.css?v=3">
+</head>
+<body class="public-board">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge">IM</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;">Instrument Board</div>
+        <div class="subtle">No login required · Real-time refresh</div>
+      </div>
+    </div>
+    <div class="flex" style="gap:8px;">
+      <button class="ghost" id="btn-toggle-full-public">Fullscreen</button>
+      <div class="subtle" id="public-status">--</div>
+    </div>
+  </header>
+
+  <main class="page" style="padding-top:16px;">
+    <section class="panel">
+      <div class="flex-between" style="margin-bottom:10px;">
+        <h2 style="margin:0;">Instrument reservation board (read-only)</h2>
+        <div class="subtle">Auto-refreshes every 15 seconds</div>
+      </div>
+      <div id="cards-grid"></div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+  <script src="/static/public.js?v=1" defer></script>
+</body>
+</html>

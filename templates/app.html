@@ -1,0 +1,271 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instrument & Sample Management</title>
+  <link rel="stylesheet" href="/static/style.css?v=3">
+</head>
+<body data-page="{{ page }}">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge">IM</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;">Instrument Manager</div>
+        <div class="subtle">Yang Group · A106</div>
+      </div>
+    </div>
+    <div class="flex" id="me-chip">
+      <span class="chip">{{ user.full_name or user.username }}</span>
+      <span class="chip">{{ user.role }}</span>
+      <button class="ghost" id="btn-logout">Log out</button>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a href="/dashboard" class="nav-link {{ 'active' if page=='dashboard' else '' }}">Dashboard</a>
+      <a href="/profile" class="nav-link {{ 'active' if page=='profile' else '' }}">Profile</a>
+      <a href="/reservations" class="nav-link {{ 'active' if page=='reservations' else '' }}">My Reservations</a>
+      <a href="/samples" class="nav-link {{ 'active' if page=='samples' else '' }}">Samples</a>
+      {% if user.role in ['super_admin', 'instrument_admin'] %}
+      <a href="/admin-board" class="nav-link {{ 'active' if page=='admin' else '' }}">Admin</a>
+      {% endif %}
+      {% if user.role == 'super_admin' %}
+      <a href="/personnel" class="nav-link {{ 'active' if page=='personnel' else '' }}">Personnel</a>
+      {% endif %}
+    </aside>
+
+    <main class="page">
+      <section id="page-dashboard" class="panel" style="display: {{ 'block' if page=='dashboard' else 'none' }};">
+        <div class="flex-between">
+        <h2>Instrument Reservation Board</h2>
+          <div class="flex" style="gap:8px;">
+            <div class="subtle">Click a card to view schedules; in scheduling mode you can assign time slots by clicking.</div>
+            <button class="ghost" id="btn-toggle-full">Fullscreen</button>
+          </div>
+        </div>
+        <div id="cards-grid"></div>
+      </section>
+
+      <section id="page-profile" class="panel" style="display: {{ 'block' if page=='profile' else 'none' }};">
+        <h2>Profile</h2>
+        <div class="profile-avatar-row">
+          <img id="profile-avatar-preview" class="profile-avatar-thumb" src="/static/uploads/avatars/default.png" alt="Avatar preview" data-full-url="/static/uploads/avatars/default.png" data-full-label="Avatar preview">
+          <div>
+            <div class="profile-avatar-title">Profile avatar</div>
+            <div class="subtle">Click the avatar to view the full image, or upload a new one below.</div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label>Full name</label>
+            <input id="prof-fullname" placeholder="Full name">
+            <label>Grade</label>
+            <input id="prof-grade" placeholder="Year 2 / PhD Year 1">
+            <label>Organization</label>
+            <input id="prof-org" placeholder="School / Department">
+          </div>
+          <div>
+            <label>Phone</label>
+            <input id="prof-phone" placeholder="Phone number">
+            <label>Email</label>
+            <input id="prof-email" placeholder="email">
+            <label>Avatar URL (optional)</label>
+            <input id="prof-photo" placeholder="https://...">
+            <label>Or upload an avatar (optional)</label>
+            <input id="prof-photo-file" type="file" accept="image/*">
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <button class="primary" id="btn-save-profile">Save</button>
+        </div>
+        <div style="margin-top:24px; border-top:1px solid var(--border); padding-top:16px;">
+          <h3>Change password</h3>
+          <label>Current password</label>
+          <input id="prof-current-password" type="password" placeholder="Current password">
+          <label>New password</label>
+          <input id="prof-new-password" type="password" placeholder="New password">
+          <div style="margin-top:12px;">
+            <button class="primary" id="btn-change-password">Change password</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-reservations" class="panel" style="display: {{ 'block' if page=='reservations' else 'none' }};">
+        <h2>Submit Reservation</h2>
+        <div class="grid-2">
+          <div>
+            <label>Reservation option</label>
+            <select id="opt-select"></select>
+            <label>Instrument preference</label>
+            <select id="instrument-prefer"></select>
+            <label>Notes</label>
+            <textarea id="reserve-remark" rows="3" placeholder="Describe your requirements or sample notes"></textarea>
+            <div style="margin-top:12px;">
+              <button class="primary" id="btn-submit-reserve">Submit</button>
+            </div>
+            <div class="subtle" id="reserve-hint"></div>
+          </div>
+          <div>
+            <div class="flex-between">
+              <label>Sample list</label>
+              <button class="ghost" id="btn-add-sample-row">Add sample</button>
+            </div>
+            <div id="sample-rows"></div>
+          </div>
+        </div>
+        <h3>My submissions</h3>
+        <table class="table" id="my-submissions-table"></table>
+      </section>
+
+      <section id="page-samples" class="panel" style="display: {{ 'block' if page=='samples' else 'none' }};">
+        <h2>Sample management</h2>
+        <div class="grid-2">
+          <div>
+            <label>Sample name *</label>
+            <input id="sample-name" placeholder="Sample code">
+            <label>Notes</label>
+            <input id="sample-remark" placeholder="Optional">
+            <label>Upload TGA image</label>
+            <input id="sample-tga" type="file" accept="image/*">
+            <label>Upload BET image</label>
+            <input id="sample-bet" type="file" accept="image/*">
+            <label>Upload PXRD image</label>
+            <input id="sample-pxrd" type="file" accept="image/*">
+            <div style="margin-top:10px;">
+              <button class="primary" id="btn-add-sample">Create sample</button>
+            </div>
+          </div>
+          <div>
+            <h3>My samples</h3>
+            <table class="table" id="samples-table"></table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-admin" class="panel" style="display: {{ 'block' if page=='admin' else 'none' }};">
+        <div class="flex-between">
+          <h2>Admin panel</h2>
+          <div class="notice">Administrators only</div>
+        </div>
+        {% if user.role == 'super_admin' %}
+        <div class="grid-2">
+          <div>
+            <h3>Instrument management</h3>
+            <label>Name</label>
+            <input id="adm-inst-name">
+            <label>Status</label>
+            <select id="adm-inst-status">
+              <option value="normal">Normal (green)</option>
+              <option value="maintenance">Maintenance (yellow)</option>
+              <option value="fault">Fault (red)</option>
+              <option value="offline">Offline (gray)</option>
+            </select>
+            <label>Description</label>
+            <input id="adm-inst-desc">
+            <div style="margin-top:10px;">
+              <button class="primary" id="btn-create-inst">Add instrument</button>
+            </div>
+            <table class="table" id="inst-table"></table>
+          </div>
+          <div>
+            <h3>Reservation option management</h3>
+            <label>Option name</label>
+            <input id="adm-opt-name" placeholder="e.g. Routine testing">
+            <div class="flex" style="flex-wrap:wrap;">
+              <label><input type="checkbox" id="chk-tga" checked> Require TGA</label>
+              <label><input type="checkbox" id="chk-pxrd" checked> Require PXRD</label>
+              <label><input type="checkbox" id="chk-bet" checked> Require BET</label>
+            </div>
+            <div style="margin-top:10px;">
+              <button class="primary" id="btn-create-opt">Create reservation option</button>
+            </div>
+            <table class="table" id="opt-table"></table>
+          </div>
+        </div>
+        {% else %}
+        <div class="notice" style="margin:12px 0;">Only super administrators can add or modify instruments and reservation options; instrument admins should use the schedule table below to manage assignments.</div>
+        {% endif %}
+        {% if user.role == 'super_admin' %}
+        <div class="urgent-insert">
+          <div class="flex-between">
+            <h3>Priority insertion</h3>
+            <span class="subtle">Shifts upcoming slots on demand</span>
+          </div>
+          <div class="grid-3">
+            <label>Instrument</label>
+            <select id="insert-inst-select"></select>
+            <label>User</label>
+            <select id="insert-user-select"></select>
+            <label>Start date</label>
+            <input type="date" id="insert-start-date">
+            <label>Duration (days)</label>
+            <input type="number" min="1" value="1" id="insert-days">
+            <label>Note</label>
+            <input id="insert-note" placeholder="Optional note for the blocked period">
+          </div>
+          <div style="margin-top:12px;">
+            <button class="danger" id="btn-insert-urgent">Insert priority slot</button>
+          </div>
+        </div>
+        {% endif %}
+        <h3>Reservation scheduling</h3>
+        <div class="schedule-controls">
+          <div>
+            <label for="schedule-option-filter">Filter by option</label>
+            <select id="schedule-option-filter"></select>
+          </div>
+          <div class="pagination-controls" id="schedule-pagination"></div>
+        </div>
+        <table class="table" id="all-submissions-table"></table>
+        <div class="subtle">Click “Schedule” to go to the dashboard in scheduling mode.</div>
+      </section>
+
+      <section id="page-personnel" class="panel" style="display: {{ 'block' if page=='personnel' else 'none' }};">
+        <div class="flex-between">
+          <h2>Personnel management</h2>
+          <div class="notice">Super administrators only</div>
+        </div>
+        <p class="subtle">Adjust user roles, assign instruments to admins, and quickly review any user's sample history.</p>
+        <div class="grid-2" style="gap:16px; margin:12px 0;">
+          <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#f8fafc;">
+            <h3>Create new user</h3>
+            <label>Username</label>
+            <input id="new-user-username" placeholder="e.g. alice">
+            <label>Role</label>
+            <select id="new-user-role">
+              <option value="user">Regular user</option>
+              <option value="instrument_admin">Instrument admin</option>
+            </select>
+            <label>Initial password</label>
+            <input id="new-user-password" type="password" placeholder="Set an initial password">
+            <label>Full name</label>
+            <input id="new-user-fullname" placeholder="Optional">
+            <label>Email</label>
+            <input id="new-user-email" placeholder="Optional">
+            <div class="flex" style="margin-top:10px; gap:10px;">
+              <button class="primary" id="btn-create-user">Create user</button>
+              <span class="subtle" style="align-self:center;">Super admins can delete or reset user passwords below.</span>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#fffdf5;">
+            <h3>Tips</h3>
+            <p>After creation, promote trusted users to instrument admins and assign instruments in this table. Use the "View samples" button to inspect any user's sample history before approving reservations.</p>
+          </div>
+        </div>
+        <div class="table-responsive" style="margin-top:12px;">
+          <table class="table" id="users-table"></table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal" id="modal-content"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="/static/app.js?v=4" defer></script>
+</body>
+</html>

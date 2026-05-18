@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Instrument Manager</title>
+  <link rel="stylesheet" href="/static/style.css?v=3">
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-badge">IM</div>
+      <div>
+        <div style="font-size:16px;font-weight:700;">Instrument Manager</div>
+        <div class="subtle">Lab reservations / sample management</div>
+      </div>
+    </div>
+    <h2 style="margin:18px 0 8px;">Login</h2>
+    <label>Username</label>
+    <input id="login-username" placeholder="Username">
+    <label>Password</label>
+    <input id="login-password" type="password" placeholder="PWD">
+    <div class="flex" style="margin-top:14px;">
+      <button class="primary" id="btn-login" style="flex:1;">Login</button>
+      <button class="ghost" id="btn-register" style="flex:1;">Register</button>
+    </div>
+    <div id="login-hint" class="subtle" style="margin-top:10px;"></div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="/static/login.js?v=4" defer></script>
+</body>
+</html>

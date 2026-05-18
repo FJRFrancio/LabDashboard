@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instrument Reservation & Sample Management</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-badge">IM</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;">Instrument Manager</div>
+        <div class="subtle">Light theme · Port 8000 · Local network access</div>
+      </div>
+    </div>
+    <nav>
+      <button class="active" data-section="dashboard">Instrument wall</button>
+      <button data-section="reserve">Submit reservation</button>
+      <button data-section="samples">Sample library</button>
+      <button data-section="admin">Admin</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="auth" class="section">
+      <div class="flex-between">
+        <h2>Login / Register</h2>
+        <div id="me-chip" class="chips"></div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <h3>Login</h3>
+          <label>Username</label>
+          <input id="login-username" placeholder="Username">
+          <label>Password</label>
+          <input id="login-password" type="password" placeholder="PWD">
+          <div style="margin-top:10px;" class="flex">
+            <button class="primary" id="btn-login">Login</button>
+            <button class="ghost" id="btn-logout">Logout</button>
+          </div>
+        </div>
+        <div>
+          <h3>Register</h3>
+          <label>Username</label>
+          <input id="reg-username" placeholder="your id">
+          <label>Password</label>
+          <input id="reg-password" type="password">
+          <label>Full name</label>
+          <input id="reg-fullname" placeholder="Full name">
+          <label>Organization / Grade</label>
+          <input id="reg-org" placeholder="School / Year 2">
+          <label>Phone</label>
+          <input id="reg-phone">
+          <label>Email</label>
+          <input id="reg-email">
+          <label>Photo URL (optional)</label>
+          <input id="reg-photo" placeholder="https://...">
+          <div style="margin-top:10px;">
+            <button class="ghost" id="btn-register">Register and log in</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-dashboard" class="section">
+      <div class="flex-between">
+        <h2>Instrument reservation board</h2>
+        <div class="subtle">Click a card to view schedules; in scheduling mode you can assign time slots directly.</div>
+      </div>
+      <div id="cards-grid"></div>
+    </section>
+
+    <section id="section-reserve" class="section" style="display:none;">
+      <h2>Submit reservation</h2>
+      <div class="grid-2">
+        <div>
+          <label>Reservation option</label>
+          <select id="opt-select"></select>
+          <label>Instrument preference</label>
+          <select id="instrument-prefer"></select>
+          <label>Notes</label>
+          <textarea id="reserve-remark" rows="3" placeholder="Describe your requirements or sample notes"></textarea>
+          <div style="margin-top:12px;">
+            <button class="primary" id="btn-submit-reserve">Submit</button>
+          </div>
+          <div class="subtle" id="reserve-hint"></div>
+        </div>
+        <div>
+          <div class="flex-between">
+            <label>Sample list</label>
+            <button class="ghost" id="btn-add-sample-row">Add sample</button>
+          </div>
+          <div id="sample-rows"></div>
+        </div>
+      </div>
+      <h3>My submissions</h3>
+      <table class="table" id="my-submissions-table"></table>
+    </section>
+
+    <section id="section-samples" class="section" style="display:none;">
+      <h2>Sample management</h2>
+      <div class="grid-2">
+        <div>
+          <label>Sample name *</label>
+          <input id="sample-name" placeholder="Sample code">
+          <label>Notes</label>
+          <input id="sample-remark" placeholder="Optional">
+          <label>TGA image URL</label>
+          <input id="sample-tga" placeholder="https://...">
+          <label>BET image URL</label>
+          <input id="sample-bet" placeholder="https://...">
+          <label>PXRD image URL</label>
+          <input id="sample-pxrd" placeholder="https://...">
+          <div style="margin-top:10px;">
+            <button class="primary" id="btn-add-sample">Create sample</button>
+          </div>
+        </div>
+        <div>
+          <h3>My samples</h3>
+          <table class="table" id="samples-table"></table>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-admin" class="section" style="display:none;">
+      <div class="flex-between">
+        <h2>Admin panel</h2>
+        <div class="notice">Admins only</div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <h3>Instrument management</h3>
+          <label>Name</label>
+          <input id="adm-inst-name">
+          <label>Status</label>
+          <select id="adm-inst-status">
+            <option value="normal">Normal (green)</option>
+            <option value="maintenance">Maintenance (yellow)</option>
+            <option value="fault">Fault (red)</option>
+            <option value="offline">Offline (gray)</option>
+          </select>
+          <label>Description</label>
+          <input id="adm-inst-desc">
+          <div style="margin-top:10px;">
+            <button class="primary" id="btn-create-inst">Add instrument</button>
+          </div>
+          <table class="table" id="inst-table"></table>
+        </div>
+        <div>
+          <h3>Reservation option management</h3>
+          <label>Option name</label>
+          <input id="adm-opt-name" placeholder="e.g. Routine testing">
+          <div class="flex" style="flex-wrap:wrap;">
+            <label><input type="checkbox" id="chk-tga" checked> Require TGA</label>
+            <label><input type="checkbox" id="chk-pxrd" checked> Require PXRD</label>
+            <label><input type="checkbox" id="chk-bet" checked> Require BET</label>
+          </div>
+          <div style="margin-top:10px;">
+            <button class="primary" id="btn-create-opt">Create reservation option</button>
+          </div>
+          <table class="table" id="opt-table"></table>
+        </div>
+      </div>
+
+      <h3>Reservation scheduling</h3>
+      <table class="table" id="all-submissions-table"></table>
+      <div class="subtle">Click “Schedule” then pick an instrument card above and set the dates in the modal.</div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal" id="modal-content"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
